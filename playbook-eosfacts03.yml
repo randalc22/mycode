@@ -1,0 +1,37 @@
+---
+- name: Network Playbook to gather facts
+  hosts: sw-1, sw-2
+  gather_facts: yes  # default is yes
+
+  # these vars can be mapped other places
+  # but need to be mapped for ansible to
+  # connect to Arista switches
+  vars:
+    ansible_connection: network_cli
+    ansible_network_os: eos
+    ansible_become: yes
+    ansible_become_method: enable
+    ansible_user: admin
+    ansible_ssh_pass: alta3
+
+  tasks:
+  - name: Show registered facts
+    debug:
+      var: ansible_facts
+
+  - name: Slice1
+    debug:
+      msg: "{{ ansible_facts.net_hostname }} slice1: {{ ansible_facts.net_api}}"
+       
+  - name: Get keys
+    set_fact:
+      key_var: "{{ ansible_facts.keys() }}" 
+
+  - name: display keys raw
+    debug:
+      var: key_var
+
+  - name: Use keys
+    debug:
+      msg: "{{ ansible_facts.item }}" 
+    loop: "{{ key_var }}"
